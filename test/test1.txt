@@ -1,3 +1,4 @@
 S -> A b
-A -> B a | c
+A -> B a | c | D
 B -> S a
+D -> test

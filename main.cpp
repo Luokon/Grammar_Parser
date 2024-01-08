@@ -61,7 +61,7 @@ void inputGrammar()
 
 int main()
 {
-    fin.open("F:\\ClionProject\\Grammar_Parser1.0\\test\\test1.txt", ios::in);
+    fin.open("F:\\ClionProject\\Grammar_Parser\\test\\test1.txt", ios::in);
     if (!fin.is_open()) printf("ERROR: can not open the file\n");
     else
     {

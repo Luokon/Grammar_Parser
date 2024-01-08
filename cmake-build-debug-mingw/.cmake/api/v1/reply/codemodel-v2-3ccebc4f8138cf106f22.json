@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "F:/ClionProject/Grammar_Parser1.0/cmake-build-debug-mingw",
-		"source" : "F:/ClionProject/Grammar_Parser1.0"
+		"build" : "F:/ClionProject/Grammar_Parser/cmake-build-debug-mingw",
+		"source" : "F:/ClionProject/Grammar_Parser"
 	},
 	"version" : 
 	{

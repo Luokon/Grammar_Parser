@@ -1,4 +1,4 @@
-# Install script for directory: F:/ClionProject/Grammar_Parser1.0
+# Install script for directory: F:/ClionProject/Grammar_Parser
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "F:/ClionProject/Grammar_Parser1.0/cmake-build-debug-mingw/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "F:/ClionProject/Grammar_Parser/cmake-build-debug-mingw/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

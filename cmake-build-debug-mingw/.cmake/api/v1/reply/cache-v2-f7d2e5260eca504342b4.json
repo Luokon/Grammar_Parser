@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "f:/ClionProject/Grammar_Parser1.0/cmake-build-debug-mingw"
+			"value" : "f:/ClionProject/Grammar_Parser/cmake-build-debug-mingw"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -575,7 +575,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/ClionProject/Grammar_Parser1.0/cmake-build-debug-mingw/CMakeFiles/pkgRedirects"
+			"value" : "F:/ClionProject/Grammar_Parser/cmake-build-debug-mingw/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -647,7 +647,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "F:/ClionProject/Grammar_Parser1.0"
+			"value" : "F:/ClionProject/Grammar_Parser"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1279,7 +1279,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/ClionProject/Grammar_Parser1.0/cmake-build-debug-mingw"
+			"value" : "F:/ClionProject/Grammar_Parser/cmake-build-debug-mingw"
 		},
 		{
 			"name" : "Grammar_Parser_IS_TOP_LEVEL",
@@ -1303,7 +1303,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/ClionProject/Grammar_Parser1.0"
+			"value" : "F:/ClionProject/Grammar_Parser"
 		},
 		{
 			"name" : "_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED",
