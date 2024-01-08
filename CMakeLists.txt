@@ -6,4 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(Grammar_Parser main.cpp
         grammarParser.cpp
         grammarParser.h
+        LL1GrammarChecker.cpp
+        LL1GrammarChecker.h
+        LL1ParserTable.cpp
+        LL1ParserTable.h
 )

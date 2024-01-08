@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include "grammarParser.h"
-
+#include "LL1GrammarChecker.h"
 using namespace std;
 
 
@@ -8,6 +8,7 @@ ifstream  fin;   // 读取文件的指针，用于获取文法
 unordered_map<string, vector<vector<string> > > G;   // 将读入文件的文法存入动态数组中方便操作，即表达式非终结符为key，右部每个产生式为一个vector，其中装非终结符和终结符
 unordered_map<string, unordered_set<string> > firstSets; // FIRST集合
 unordered_map<string, unordered_set<string> > followSets; // FOLLOW集合
+unordered_map<string, map<string, vector<string> > > parserTable; // 预测分析表
 string starter; // 文法开始符，默认第一个符号
 
 void inputGrammar()
@@ -73,8 +74,19 @@ int main()
 //        grammarParser::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
         grammarParser::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
 //        grammarParser::simplifyGrammar(G, starter);     // 简化后最终版本
-          grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
+        grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
         grammarParser::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
+
+        // 判断是否为LL(1)文法
+        // 创建 LL1GrammarChecker 对象
+        LL1GrammarChecker grammarChecker(firstSets, followSets);
+        // 检查文法是否满足 LL(1) 文法条件
+        bool isLL1 = grammarChecker.isLL1Grammar(G);
+        if(isLL1)
+        {
+            cout<<"该文法为LL（1）文法\n";
+        }
+        else cout<<"该文法不是LL（1）文法\n";
     }
 
     return 0;
