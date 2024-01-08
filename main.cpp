@@ -61,7 +61,7 @@ void inputGrammar()
 
 int main()
 {
-    fin.open("F:\\ClionProject\\Grammar_Parser\\test\\test1.txt", ios::in);
+    fin.open("F:\\ClionProject\\Grammar_Parser\\test\\test2.txt", ios::in);
     if (!fin.is_open()) printf("ERROR: can not open the file\n");
     else
     {
@@ -71,7 +71,7 @@ int main()
 
         // 语法分析
         grammarParser::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
-//        grammarParser::directLeftRecursion(G, starter);    // 消除直接左递归，同理边判断边处理，没有则不做处理
+        grammarParser::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
 //        grammarParser::simplifyGrammar(G, starter);     // 简化后最终版本
 //        grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
 //        grammarParser::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合

@@ -9,31 +9,29 @@ void grammarParser::display(const unordered_map<string, vector<vector<string> > 
 {
     for (const auto& [nonterminal, productions] : G)
     {
-        cout << nonterminal << "->";
+        cout << nonterminal << " ->";
         for (int i = 0; i < productions.size(); ++i)
         {
             const vector<string>& production = productions[i];
             for (int j = 0; j < production.size(); ++j)
             {
-                cout << production[j] ;
+                cout <<" " << production[j] ;
             }
             if (i != productions.size() - 1)
             {
-                cout << "|";
+                cout << " |";
             }
         }
         cout << endl;
     }
 }
 // 间接左递归转换直接左递归
-vector<string > grammarParser::indirectRecursionDFS(const string& father, string first, vector<string> & tail, vector<string> & result,
+vector<string > grammarParser::indirectRecursionDFS(const string& father, string first, vector<string> & result,
                                                     const unordered_map<string, vector<vector<string>>>& G,
                                                     set<string> visit)
 {
     if (first == father) {
-        result.insert(find(result.begin(), result.end(),"|"), tail.begin(), tail.end());
         result.insert(result.begin(), father);
-        result.insert(result.begin(), "|");
         return result;
     }
 
@@ -41,19 +39,12 @@ vector<string > grammarParser::indirectRecursionDFS(const string& father, string
     {
         if (G.count(first)) {   // 非终结符
             vector<vector<string>> productions = G.at(first);
-            bool flag = false;
+
             for (auto production : productions) {
                 if (G.count(production[0]) && ( !visit.count(production[0]) || (production[0] == father) ) ) {    // 确保非终结符
-                    flag = true;
                     result.insert(result.begin(), production.begin() + 1 , production.end());
-                    result = indirectRecursionDFS(father, production[0], tail, result, G, visit);
+                    result = indirectRecursionDFS(father, production[0], result, G, visit);
                 }
-//                else if(flag)
-//                {// 如果该非终结符被替换过
-//                    vector<string > tmp(production.begin(), production.end());
-//                    tmp.insert(tmp.begin(), "|");
-//                    result.insert(result.end(), tmp.begin(), tmp.end());
-//                }
             }
             visit.insert(first);
         }
@@ -74,23 +65,22 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
             if(G.count(first) && first != father)
             {// 自上而下推导看是否有间接递归
                 vector<string> result;  // 初始插入
-                vector<string> tail(production.begin() + 1, production.end()); //当前产生式的末尾
                 set<string> visit;
                 visit.insert(father);
-                result = indirectRecursionDFS(father, first, tail, result, G, visit);
+                result = indirectRecursionDFS(father, first, result, G, visit);
 
-                if(result[0] == "|")
+                if(result[0] == father)
                 {
                     flag = true;
                     // 第一个产生式
-
+                    vector<string> tail(production.begin() + 1, production.end()); //当前产生式的末尾
                     while (!result.empty())
                     {
-                        result.erase(result.begin());
-                        vector<string> split(result.begin(), find(result.begin()+1, result.end(), "|"));
+                        vector<string> split(result.begin(), find(result.begin()+1, result.end(), father));
+                        split.insert(split.end(), tail.begin(), tail.end());
                         newProductions.push_back(split);
+                        result.erase(result.begin(), find(result.begin()+1, result.end(), father));
                     }
-
                 }
                 else newProductions.push_back(production);
             }
@@ -106,52 +96,57 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
     }
     else cout<<"该文法没有间接左递归\n";
 }
-//// 直接左递归消除处理
-//void grammarParser::directLeftRecursion(unordered_map<string, vector<vector<string> > >& G, string start)
-//{
-//    bool flag = false;
-//    unordered_map<string, vector<string>> newGrammar;
-//
-//    for (const auto& [nonTerminal, productions] : G) {
-//        vector<string> nonRecursiveProductions;
-//        vector<string> recursiveProductions;
-//
-//        for (const string& production : productions) {
-//            if (production.substr(0, nonTerminal.size()) == nonTerminal) {
-//                flag = true;
-//                recursiveProductions.push_back(production.substr(nonTerminal.size()));
-//            } else {
-//                nonRecursiveProductions.push_back(production);
-//            }
-//        }
-//
-//        if (!recursiveProductions.empty()) {
-//            string newNonTerminal = nonTerminal + "'";
-//
-//            for (const string& recursiveProduction : recursiveProductions) {
-//                newGrammar[newNonTerminal].push_back(recursiveProduction + newNonTerminal);
-//            }
-//
-//            for (const string& nonRecursiveProduction : nonRecursiveProductions) {
-//                newGrammar[nonTerminal].push_back(nonRecursiveProduction + newNonTerminal);
-//            }
-//            newGrammar[newNonTerminal].push_back("ε");
-//        } else {
-//            for (const string& nonRecursiveProduction : nonRecursiveProductions) {
-//                newGrammar[nonTerminal].push_back(nonRecursiveProduction);
-//            }
-//        }
-//    }
-//    if(flag) {
-//        G = newGrammar;
-//        cout<<"\n消除直接左递归：\n";
-//        display(G);
-//    } else {
-//        cout<<"\n该文法没有直接左递归，继续处理\n";
-//    }
-//
-//};
-//
+
+// 直接左递归消除处理
+void grammarParser::directLeftRecursion(unordered_map<string, vector<vector<string>>>& G)
+{
+    bool flag = false;
+    unordered_map<string, vector<vector<string>>> newGrammar;
+
+    for (const auto& [nonTerminal, productions] : G) {
+        vector<vector<string>> nonRecursiveProductions;
+        vector<vector<string>> recursiveProductions;
+
+        for (const auto& production : productions) {
+            if (production[0] == nonTerminal) {
+                flag = true;
+                recursiveProductions.push_back(vector<string>(production.begin() + 1, production.end()));
+            } else {
+                nonRecursiveProductions.push_back(production);
+            }
+        }
+
+        if (!recursiveProductions.empty()) {
+            string newNonTerminal = nonTerminal + "'";
+
+            for (const auto& recursiveProduction : recursiveProductions) {
+                vector<string> newProduction = recursiveProduction;
+                newProduction.push_back(newNonTerminal);
+                newGrammar[newNonTerminal].push_back(newProduction);
+            }
+
+            for (const auto& nonRecursiveProduction : nonRecursiveProductions) {
+                vector<string> newProduction = nonRecursiveProduction;
+                newProduction.push_back(newNonTerminal);
+                newGrammar[nonTerminal].push_back(newProduction);
+            }
+            newGrammar[newNonTerminal].push_back({"ε"});
+        } else {
+            for (const auto& nonRecursiveProduction : nonRecursiveProductions) {
+                newGrammar[nonTerminal].push_back(nonRecursiveProduction);
+            }
+        }
+    }
+
+    if (flag) {
+        G = newGrammar;
+        cout << "\n消除直接左递归：\n";
+        display(G);
+    } else {
+        cout << "\n该文法没有直接左递归，继续处理\n";
+    }
+}
+
 //// 使用深度优先搜索将能从开始符号到达的非终结符标记
 //void grammarParser::markReachableProductions(unordered_map<string, vector<vector<string> > >& G, const string& start, unordered_set<string>& reachable) {
 //    reachable.insert(start);

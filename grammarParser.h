@@ -9,8 +9,12 @@ using namespace std;
 
 class grammarParser {
 public:
-    static void directLeftRecursion(unordered_map<string, vector<vector<string> > >& G, string start); // 消除直接左递归
+    static void directLeftRecursion(unordered_map<string, vector<vector<string> > >& G); // 消除直接左递归
+
     static void eliminateIndirectRecursion(unordered_map<string, vector<vector<string> > > &G); // 消除间接左递归
+    static vector<string> indirectRecursionDFS(const string &father, string first, vector<string> &result,
+                                               const unordered_map<string, vector<vector<string>>> &G, set<string> visit);
+
     static void simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start);
     static void markReachableProductions(unordered_map<string, vector<vector<string> > > &G, const string &start,
                                          unordered_set<string> &reachable);
@@ -36,9 +40,7 @@ public:
                                   unordered_map<string, vector<vector<string>>> &G);
 
 
-    static vector<string> indirectRecursionDFS(const string& father, string first, vector<string> & tail, vector<string> & result,
-                                               const unordered_map<string, vector<vector<string>>>& G,
-                                               set<string> visit);
+
 };
 
 
