@@ -36,8 +36,8 @@ public:
                                   unordered_map<string, vector<vector<string>>> &G);
 
 
-    static vector<string> indirectRecursionDFS(const string &father, string first, vector<string> &newProductions,
-                                        const unordered_map<string, vector<vector<string>>> &G,
+    static vector<string> indirectRecursionDFS(const string& father, string first, vector<string> & tail, vector<string> & result,
+                                               const unordered_map<string, vector<vector<string>>>& G,
                                                set<string> visit);
 };
 

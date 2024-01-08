@@ -26,12 +26,14 @@ void grammarParser::display(const unordered_map<string, vector<vector<string> > 
     }
 }
 // 间接左递归转换直接左递归
-vector<string > grammarParser::indirectRecursionDFS(const string& father, string first, vector<string> & result,
+vector<string > grammarParser::indirectRecursionDFS(const string& father, string first, vector<string> & tail, vector<string> & result,
                                                     const unordered_map<string, vector<vector<string>>>& G,
                                                     set<string> visit)
 {
     if (first == father) {
+        result.insert(find(result.begin(), result.end(),"|"), tail.begin(), tail.end());
         result.insert(result.begin(), father);
+        result.insert(result.begin(), "|");
         return result;
     }
 
@@ -39,12 +41,19 @@ vector<string > grammarParser::indirectRecursionDFS(const string& father, string
     {
         if (G.count(first)) {   // 非终结符
             vector<vector<string>> productions = G.at(first);
-
+            bool flag = false;
             for (auto production : productions) {
                 if (G.count(production[0]) && ( !visit.count(production[0]) || (production[0] == father) ) ) {    // 确保非终结符
+                    flag = true;
                     result.insert(result.begin(), production.begin() + 1 , production.end());
-                    result = indirectRecursionDFS(father, production[0], result, G, visit);
+                    result = indirectRecursionDFS(father, production[0], tail, result, G, visit);
                 }
+//                else if(flag)
+//                {// 如果该非终结符被替换过
+//                    vector<string > tmp(production.begin(), production.end());
+//                    tmp.insert(tmp.begin(), "|");
+//                    result.insert(result.end(), tmp.begin(), tmp.end());
+//                }
             }
             visit.insert(first);
         }
@@ -65,22 +74,23 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
             if(G.count(first) && first != father)
             {// 自上而下推导看是否有间接递归
                 vector<string> result;  // 初始插入
+                vector<string> tail(production.begin() + 1, production.end()); //当前产生式的末尾
                 set<string> visit;
                 visit.insert(father);
-                result = indirectRecursionDFS(father, first, result, G, visit);
+                result = indirectRecursionDFS(father, first, tail, result, G, visit);
 
-                if(result[0] == father)
+                if(result[0] == "|")
                 {
                     flag = true;
                     // 第一个产生式
-                    vector<string> tail(production.begin() + 1, production.end()); //当前产生式的末尾
+
                     while (!result.empty())
                     {
-                        vector<string> split(result.begin(), find(result.begin()+1, result.end(), father));
-                        split.insert(split.end(), tail.begin(), tail.end());
+                        result.erase(result.begin());
+                        vector<string> split(result.begin(), find(result.begin()+1, result.end(), "|"));
                         newProductions.push_back(split);
-                        result.erase(result.begin(), find(result.begin()+1, result.end(), father));
                     }
+
                 }
                 else newProductions.push_back(production);
             }
