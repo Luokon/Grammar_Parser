@@ -64,6 +64,7 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
             string first = production[0];
             if(G.count(first) && first != father)
             {// 自上而下推导看是否有间接递归
+
                 vector<string> result;  // 初始插入
                 set<string> visit;
                 visit.insert(father);
@@ -74,6 +75,7 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
                     flag = true;
                     // 第一个产生式
                     vector<string> tail(production.begin() + 1, production.end()); //当前产生式的末尾
+
                     while (!result.empty())
                     {
                         vector<string> split(result.begin(), find(result.begin()+1, result.end(), father));
@@ -81,11 +83,15 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
                         newProductions.push_back(split);
                         result.erase(result.begin(), find(result.begin()+1, result.end(), father));
                     }
+
                 }
-                else newProductions.push_back(production);
+
             }
-            else newProductions.push_back(production);
+            if(!flag) {
+                newProductions.push_back(production);
+            }
         }
+//        cout<<"无";
         newG[father] = newProductions;
     }
     if(flag)
@@ -147,149 +153,157 @@ void grammarParser::directLeftRecursion(unordered_map<string, vector<vector<stri
     }
 }
 
-//// 使用深度优先搜索将能从开始符号到达的非终结符标记
-//void grammarParser::markReachableProductions(unordered_map<string, vector<vector<string> > >& G, const string& start, unordered_set<string>& reachable) {
-//    reachable.insert(start);
-//
-//    for (auto production : G[start]) {
-//        for (int i = 0; i < production.size(); i++) {
-//            if(!isupper(production[i])) continue;
-//
-//            string str;
-//            str.push_back(production[i]);
-//
-//            if (i < production.size() - 1 && production[i + 1] == '\'') {
-//                str.push_back('\'');
-//                i++;
-//            }
-//
-//            if (G.find(str) != G.end() && reachable.count(str) == 0) {
-//                markReachableProductions(G, str, reachable);
-//            }
-//        }
-//    }
-//}
-//void grammarParser::simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start) {
-//    // 移除不能与开始符号关联的表达式，即没被标记的非终结符与其表达式
-//    unordered_set<string> reachable;
-//    markReachableProductions(G, start, reachable);
-//
-//    for (auto it = G.begin(); it != G.end();) {
-//        if (reachable.count(it->first) == 0) {
-//            it = G.erase(it);
-//        } else {
-//            ++it;
-//        }
-//    }
-//    cout<<"\n处理完成后的文法：\n";
-//    display(G);
-//}
-//
-//// 计算FIRST集合
-//void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<string> > >& G, const string& symbol, unordered_set<string>& firstSet) {
-//    if (firstSet.find(symbol) != firstSet.end()) {
-//        return;  // 已经计算过，避免重复计算
-//    }
-//
-//    for (const string& production : G[symbol]) {
-//        string firstSym;
-//        firstSym.push_back(production[0]);
-//        if(production[1] == '\'') firstSym += "'";
-//        if(production == "ε") firstSym = production;
-//        // 发现希腊符号占两个字符无法单一输出，暂时不接受除了ε的希腊字符
-//
-//        if (G.find(firstSym) != G.end()) {
-//            // 非终结符，递归计算FIRST集合
-//            calculateFirstSetDFS(G, firstSym, firstSet);
-//            unordered_set<string> firstSetOfFirstChar = firstSet;
-//            for (const string& firstSymbol : firstSetOfFirstChar) {
-//                if (firstSymbol != "ε") {
-//                    firstSet.insert(firstSymbol);
-//                }
-//            }
-//        } else {
-//            // 终结符，直接添加到FIRST集合
-//            firstSet.insert(firstSym);
-//        }
-//    }
-//}
-//void grammarParser::calculateFirstSet(unordered_map<string, vector<string>>& G, unordered_map<string, unordered_set<string>> &firstSets) {
-//    for (auto& production : G) {
-//        const string& symbol = production.first;
-//        unordered_set<string> firstSet;
-//        calculateFirstSetDFS(G, symbol, firstSet);
-//        firstSets[symbol] = firstSet;
-//    }
-//
-//    cout << "\nFIRST集合：\n";
-//    for (const auto& i : firstSets) {
-//        cout << "FIRST(" << i.first << ") = {";
-//        for (const auto& symbol : i.second) {
-//            cout <<" "<< symbol << " ";
-//        }
-//        cout << "}\n";
-//    }
-//}
-//
-//// 计算FOLLOW集合
-//void grammarParser::calculateFollowSet(unordered_map<string, vector<string>>& G, unordered_map<string, unordered_set<string>>& firstSets, unordered_map<string, unordered_set<string>>& followSets, const string& start) {
-//    // 初始化起始符号的FOLLOW集合
-//    followSets[start].insert("$");
-//
-//    // 遍历产生式，计算FOLLOW集合
-//    for (const auto& [nonTerminal, productions] : G) {
-//        for (const string& production : productions) {
-//            for (size_t i = 0; i < production.size(); ++i) {
-//                string symbol;
-//                symbol.push_back(production[i]);
-//                if(i < production.size() - 1 && production[i + 1] == '\'')
-//                    symbol += "'", i++;
-//
-//                if (G.find(symbol) != G.end()) {
-//                    // 非终结符
-//                    if (i < production.size() - 1) {
-//                        // 非终结符后面还有符号
-//                        string nextSymbol = string(1, production[i + 1]);
-//                        if(i < production.size() - 2 && production[i + 2] == '\'')
-//                            nextSymbol += "'";
-//
-//                        if (G.find(nextSymbol) != G.end()) {
-//                            // 后继符号是非终结符
-//                            const unordered_set<string>& firstSet = firstSets[nextSymbol];
-//                            unordered_set<string>& followSet = followSets[symbol];
-//                            for (const string& firstSymbol : firstSet) {
-//                                if (firstSymbol != "ε") {
-//                                    followSet.insert(firstSymbol);
-//                                }
-//                            }
-//                            if (firstSet.find("ε") != firstSet.end()) {
-//                                // FIRST集合包含ε，则将其后的FIRST集合加入FOLLOW集合
-//                                const unordered_set<string>& nextFirstSet = followSets[nextSymbol];
-//                                for (const string& nextFirstSymbol : nextFirstSet) {
-//                                    followSet.insert(nextFirstSymbol);
-//                                }
-//                            }
-//                        } else {
-//                            // 后继符号是终结符
-//                            followSets[symbol].insert(nextSymbol);
-//                        }
-//                    } else {
-//                        // 非终结符是产生式的最后一个符号
-//                        const unordered_set<string>& followSet = followSets[nonTerminal];
-//                        for (const string& followSymbol : followSet) {
-//                            followSets[symbol].insert(followSymbol);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    cout << "\nFOLLOW集合：\n";
-//    for (const auto& i : followSets) {
-//        cout << "FOLLOW(" << i.first << ") = {";
-//        for (const auto& symbol : i.second) {
-//            cout <<" "<< symbol << " ";
-//        }
-//        cout << "}\n";
-//    }
-//}
+// 使用深度优先搜索将能从开始符号到达的非终结符标记
+void grammarParser::markReachableProductions(unordered_map<string, vector<vector<string>>>& G, const string& start, unordered_set<string>& reachable)
+{
+    reachable.insert(start);
+
+    if (G.find(start) != G.end()) {
+        for (const auto& production : G[start]) {
+            for (const auto& symbol : production) {
+                if (G.count(symbol)) {
+                    string nonTerminal = symbol;
+
+                    if (!production.empty() && production[1] == "'") {
+                        nonTerminal += "'";
+                    }
+
+                    if (reachable.count(nonTerminal) == 0) {
+                        markReachableProductions(G, nonTerminal, reachable);
+                    }
+                }
+            }
+        }
+    }
+}
+void grammarParser::simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start) {
+    // 移除不能与开始符号关联的表达式，即没被标记的非终结符与其表达式
+    unordered_set<string> reachable;
+    markReachableProductions(G, start, reachable);
+
+    for (auto it = G.begin(); it != G.end();) {
+        if (reachable.count(it->first) == 0) {
+            it = G.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    cout<<"\n处理完成后的文法：\n";
+    display(G);
+}
+
+// 计算FIRST集合
+void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<string>>>& G, const string& symbol, unordered_set<string>& firstSet, unordered_map<string, unordered_set<string>>& firstSets) {
+    if (firstSet.find(symbol) != firstSet.end()) {
+        return; // 已经计算过，避免重复计算
+    }
+
+    for (const vector<string>& production : G[symbol]) {
+        bool allSymbolsNullable = true;
+        for (const string& prodSymbol : production) {
+            if (G.find(prodSymbol) != G.end()) {
+                // 非终结符，递归计算FIRST集合
+                calculateFirstSetDFS(G, prodSymbol, firstSet, firstSets);
+                unordered_set<string> firstSetOfProdSymbol = firstSets[prodSymbol];
+                for (const string& first : firstSetOfProdSymbol) {
+                    if (first != "ε") {
+                        firstSet.insert(first);
+                    }
+                }
+                if (firstSetOfProdSymbol.find("ε") == firstSetOfProdSymbol.end()) {
+                    allSymbolsNullable = false;
+                    break;
+                }
+            } else {
+                // 终结符，直接添加到FIRST集合
+                firstSet.insert(prodSymbol);
+                allSymbolsNullable = false;
+                break;
+            }
+        }
+        if (allSymbolsNullable) {
+            firstSet.insert("ε");
+        }
+    }
+}
+
+void grammarParser::calculateFirstSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets) {
+    bool updated;
+    do {
+        updated = false;
+        for (auto& production : G) {
+            const string& symbol = production.first;
+            unordered_set<string> firstSet;
+            calculateFirstSetDFS(G, symbol, firstSet, firstSets);
+            if (firstSets[symbol] != firstSet) {
+                firstSets[symbol] = firstSet;
+                updated = true;
+            }
+        }
+    } while (updated);
+
+    cout << "\nFIRST集合：\n";
+    for (const auto& i : firstSets) {
+        cout << "FIRST(" << i.first << ") = {";
+        for (const auto& symbol : i.second) {
+            cout << " " << symbol << " ";
+        }
+        cout << "}\n";
+    }
+}
+// 计算FOLLOW集合
+void grammarParser::calculateFollowSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets, unordered_map<string, unordered_set<string>>& followSets, const string& start) {
+    // 初始化起始符号的FOLLOW集合
+    followSets[start].insert("$");
+
+    // 遍历产生式，计算FOLLOW集合
+    for (const auto& [nonTerminal, productions] : G) {
+        for (const vector<string>& production : productions) {
+            for (size_t i = 0; i < production.size(); ++i) {
+                const string& symbol = production[i];
+                if (G.find(symbol) != G.end()) {
+                    // 非终结符
+                    if (i < production.size() - 1) {
+                        // 非终结符后面还有符号
+                        const string& nextSymbol = production[i + 1];
+                        if (G.find(nextSymbol) != G.end()) {
+                            // 后继符号是非终结符
+                            const unordered_set<string>& firstSet = firstSets[nextSymbol];
+                            unordered_set<string>& followSet = followSets[symbol];
+                            for (const string& firstSymbol : firstSet) {
+                                if (firstSymbol != "ε") {
+                                    followSet.insert(firstSymbol);
+                                }
+                            }
+                            if (firstSet.find("ε") != firstSet.end()) {
+                                // FIRST集合包含ε，则将其后的FOLLOW集合加入FOLLOW集合
+                                const unordered_set<string>& nextFollowSet = followSets[nextSymbol];
+                                for (const string& nextFollowSymbol : nextFollowSet) {
+                                    followSet.insert(nextFollowSymbol);
+                                }
+                            }
+                        } else {
+                            // 后继符号是终结符
+                            followSets[symbol].insert(nextSymbol);
+                        }
+                    } else {
+                        // 非终结符是产生式的最后一个符号
+                        const unordered_set<string>& followSet = followSets[nonTerminal];
+                        for (const string& followSymbol : followSet) {
+                            followSets[symbol].insert(followSymbol);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    cout << "\nFOLLOW集合：\n";
+    for (const auto& i : followSets) {
+        cout << "FOLLOW(" << i.first << ") = {";
+        for (const auto& symbol : i.second) {
+            cout << " " << symbol << " ";
+        }
+        cout << "}\n";
+    }
+}

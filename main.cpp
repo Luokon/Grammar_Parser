@@ -70,11 +70,11 @@ int main()
         // 词法分析
 
         // 语法分析
-        grammarParser::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
+//        grammarParser::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
         grammarParser::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
 //        grammarParser::simplifyGrammar(G, starter);     // 简化后最终版本
-//        grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
-//        grammarParser::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
+          grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
+        grammarParser::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
     }
 
     return 0;
