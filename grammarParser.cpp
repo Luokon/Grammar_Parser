@@ -256,47 +256,72 @@ void grammarParser::calculateFollowSet(unordered_map<string, vector<vector<strin
     // 初始化起始符号的FOLLOW集合
     followSets[start].insert("$");
 
-    // 遍历产生式，计算FOLLOW集合
-    for (const auto& [nonTerminal, productions] : G) {
-        for (const vector<string>& production : productions) {
-            for (size_t i = 0; i < production.size(); ++i) {
-                const string& symbol = production[i];
-                if (G.find(symbol) != G.end()) {
-                    // 非终结符
-                    if (i < production.size() - 1) {
-                        // 非终结符后面还有符号
-                        const string& nextSymbol = production[i + 1];
-                        if (G.find(nextSymbol) != G.end()) {
-                            // 后继符号是非终结符
-                            const unordered_set<string>& firstSet = firstSets[nextSymbol];
-                            unordered_set<string>& followSet = followSets[symbol];
-                            for (const string& firstSymbol : firstSet) {
-                                if (firstSymbol != "ε") {
-                                    followSet.insert(firstSymbol);
+    bool updated;
+    do {
+        updated = false;
+        // 遍历产生式，计算FOLLOW集合
+        for (const auto& [nonTerminal, productions] : G) {
+            for (const vector<string>& production : productions) {
+                for (size_t i = 0; i < production.size(); ++i) {
+                    // 遍历产生式中的符号
+                    const string& symbol = production[i];
+                    if (G.find(symbol) != G.end()) {
+
+                        // 非终结符
+                        unordered_set<string>& followSet = followSets[symbol];
+                        if (i < production.size() - 1) {
+                            // 非终结符后面还有符号，就将其 FIRST 集合加入当前 FOLLOW 集合
+                            const string& nextSymbol = production[i + 1];
+                            if (G.find(nextSymbol) != G.end()) {
+                                // 后继符号是非终结符
+                                const unordered_set<string>& firstSet = firstSets[nextSymbol];
+                                for (const string& firstSymbol : firstSet) {
+                                    if (firstSymbol != "ε") {
+                                        if (followSet.insert(firstSymbol).second) {
+                                            updated = true;
+                                        }
+                                    }
                                 }
-                            }
-                            if (firstSet.find("ε") != firstSet.end()) {
-                                // FIRST集合包含ε，则将其后的FOLLOW集合加入FOLLOW集合
-                                const unordered_set<string>& nextFollowSet = followSets[nextSymbol];
-                                for (const string& nextFollowSymbol : nextFollowSet) {
-                                    followSet.insert(nextFollowSymbol);
+                                if (firstSet.find("ε") != firstSet.end()) {
+                                    // 若当前符号后面所有符号FIRST集合都包含ε，则将当前左部符号的 FOLLOW 集合加入当前非终结符的 FOLLOW 集合
+                                    bool isAdd = true;
+                                    for (size_t j = i + 1; j < production.size(); ++j)
+                                    {
+                                        if(G.find(production[j]) == G.end() || firstSets[production[j]].find("ε") == firstSets[production[j]].end())
+                                        {   // 后面有终结符也不能加
+                                            isAdd = false;
+                                        }
+                                    }
+                                    if(isAdd)
+                                    {
+                                        for (auto followSymbol : followSets[nonTerminal]) {
+                                            if (followSet.insert(followSymbol).second) {
+                                                updated = true;
+                                            }
+                                        }
+                                    }
+
+                                }
+                            } else{
+                                // 终结符直接加入
+                                if(followSet.insert(nextSymbol).second)
+                                {
+                                    updated = true;
                                 }
                             }
                         } else {
-                            // 后继符号是终结符
-                            followSets[symbol].insert(nextSymbol);
-                        }
-                    } else {
-                        // 非终结符是产生式的最后一个符号
-                        const unordered_set<string>& followSet = followSets[nonTerminal];
-                        for (const string& followSymbol : followSet) {
-                            followSets[symbol].insert(followSymbol);
+                            // 非终结符是产生式的最后一个符号
+                            for (const string& followSymbol : followSets[nonTerminal]) {
+                                if (followSet.insert(followSymbol).second) {
+                                    updated = true;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
+    } while (updated);
 
     cout << "\nFOLLOW集合：\n";
     for (const auto& i : followSets) {
