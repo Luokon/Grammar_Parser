@@ -5,6 +5,7 @@
 #ifndef LL1GRAMMARCHECKER_H
 #define LL1GRAMMARCHECKER_H
 
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include "grammarParser.h"
 #include "LL1GrammarChecker.h"
+#include "LL1ParserTable.h"
 using namespace std;
 
 
@@ -8,7 +9,7 @@ ifstream  fin;   // 读取文件的指针，用于获取文法
 unordered_map<string, vector<vector<string> > > G;   // 将读入文件的文法存入动态数组中方便操作，即表达式非终结符为key，右部每个产生式为一个vector，其中装非终结符和终结符
 unordered_map<string, unordered_set<string> > firstSets; // FIRST集合
 unordered_map<string, unordered_set<string> > followSets; // FOLLOW集合
-unordered_map<string, map<string, vector<string> > > parserTable; // 预测分析表
+unordered_map<string, unordered_map<string, vector<string> > > parserTable; // 预测分析表
 string starter; // 文法开始符，默认第一个符号
 
 void inputGrammar()
@@ -85,6 +86,10 @@ int main()
         if(isLL1)
         {
             cout<<"该文法为LL（1）文法\n";
+            LL1ParserTable table;
+            table.getParserTable(parserTable, G, firstSets, followSets);
+            table.printParserTable(parserTable);
+
         }
         else cout<<"该文法不是LL（1）文法\n";
     }

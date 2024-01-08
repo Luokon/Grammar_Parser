@@ -3,7 +3,6 @@
 //
 
 #include "LL1GrammarChecker.h"
-#include <iostream>
 
 LL1GrammarChecker::LL1GrammarChecker(unordered_map<string, unordered_set<string>>& first,
                                      unordered_map<string, unordered_set<string>>& follow)

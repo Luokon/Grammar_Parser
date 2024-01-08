@@ -4,24 +4,23 @@
 
 #ifndef LL1_PARSER_TABLE_H
 #define LL1_PARSER_TABLE_H
-
+#include <iostream>
 #include <unordered_map>
-#include <map>
+#include <unordered_set>
 #include <vector>
 #include <string>
-
+#include <iomanip>
+#include <set>
 using namespace std;
 
 class LL1ParserTable {
 public:
-    LL1ParserTable();
+    static void getParserTable(unordered_map<string, unordered_map<string, vector<string>>> &parserTable,
+                        const unordered_map<string, vector<vector<string>>> &G,
+                        const unordered_map<string, unordered_set<string>> &firstSets,
+                        const unordered_map<string, unordered_set<string>> &followSets);
 
-    void addEntry(const string& nonTerminal, const string& terminal, const vector<string>& production);
-    vector<string> getProduction(const string& nonTerminal, const string& terminal);
-    bool hasEntry(const string& nonTerminal, const string& terminal);
-
-private:
-    unordered_map<string, map<string, vector<string>>> table;
+    static void printParserTable(const unordered_map<string, unordered_map<string, vector<string>>> &parserTable);
 };
 
 #endif // LL1_PARSER_TABLE_H
