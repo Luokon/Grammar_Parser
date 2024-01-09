@@ -193,7 +193,9 @@ void grammarParser::simplifyGrammar(unordered_map<string, vector<vector<string> 
 }
 
 // 计算FIRST集合
-void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<string>>>& G, const string& symbol, unordered_set<string>& firstSet, unordered_map<string, unordered_set<string>>& firstSets) {
+void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<string>>>& G, const string& symbol,
+                                         unordered_set<string>& firstSet, unordered_map<string, unordered_set<string>>& firstSets,
+                                         unordered_map<string, unordered_map<string, vector<string>>> &firstMap) {
     if (firstSet.find(symbol) != firstSet.end()) {
         return; // 已经计算过，避免重复计算
     }
@@ -203,11 +205,12 @@ void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<str
         for (const string& prodSymbol : production) {
             if (G.find(prodSymbol) != G.end()) {
                 // 非终结符，递归计算FIRST集合
-                calculateFirstSetDFS(G, prodSymbol, firstSet, firstSets);
+                calculateFirstSetDFS(G, prodSymbol, firstSet, firstSets, firstMap);
                 unordered_set<string> firstSetOfProdSymbol = firstSets[prodSymbol];
                 for (const string& first : firstSetOfProdSymbol) {
                     if (first != "ε") {
                         firstSet.insert(first);
+                        firstMap[symbol][first] = production;
                     }
                 }
                 if (firstSetOfProdSymbol.find("ε") == firstSetOfProdSymbol.end()) {
@@ -217,6 +220,7 @@ void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<str
             } else {
                 // 终结符，直接添加到FIRST集合
                 firstSet.insert(prodSymbol);
+                firstMap[symbol][prodSymbol] = production;
                 allSymbolsNullable = false;
                 break;
             }
@@ -227,14 +231,16 @@ void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<str
     }
 }
 
-void grammarParser::calculateFirstSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets) {
+void grammarParser::calculateFirstSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets,
+                                      unordered_map<string, unordered_map<string, vector<string>>> &firstMap)
+                                      {
     bool updated;
     do {
         updated = false;
         for (auto& production : G) {
             const string& symbol = production.first;
             unordered_set<string> firstSet;
-            calculateFirstSetDFS(G, symbol, firstSet, firstSets);
+            calculateFirstSetDFS(G, symbol, firstSet, firstSets, firstMap);
             if (firstSets[symbol] != firstSet) {
                 firstSets[symbol] = firstSet;
                 updated = true;

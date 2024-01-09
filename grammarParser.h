@@ -21,10 +21,12 @@ public:
                                          unordered_set<string> &reachable);
 
     static void calculateFirstSet(unordered_map<string, vector<vector<string>>> &G,
-                                  unordered_map<string, unordered_set<string>> &firstSets);
+                                  unordered_map<string, unordered_set<string>> &firstSets,
+                                  unordered_map<string, unordered_map<string, vector<string> > > &firstMap);
 
     static void calculateFirstSetDFS(unordered_map<string, vector<vector<string>>> &G, const string &symbol,
-                                     unordered_set<string> &firstSet, unordered_map<string, unordered_set<string>> &firstSets);
+                                     unordered_set<string> &firstSet, unordered_map<string, unordered_set<string>> &firstSets,
+                                     unordered_map<string, unordered_map<string, vector<string>>> &firstMap);
 
     static void calculateFollowSet(unordered_map<string, vector<vector<string>>> &G,
                             unordered_map<string, unordered_set<string>> &firstSets,

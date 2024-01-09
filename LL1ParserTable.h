@@ -18,7 +18,8 @@ public:
     static void getParserTable(unordered_map<string, unordered_map<string, vector<string>>> &parserTable,
                         const unordered_map<string, vector<vector<string>>> &G,
                         const unordered_map<string, unordered_set<string>> &firstSets,
-                        const unordered_map<string, unordered_set<string>> &followSets);
+                        const unordered_map<string, unordered_set<string>> &followSets,
+                        unordered_map<string, unordered_map<string, vector<string>>> &firstMap);
 
     static void printParserTable(const unordered_map<string, unordered_map<string, vector<string>>> &parserTable);
 };

@@ -8,36 +8,24 @@
 void LL1ParserTable::getParserTable(unordered_map<string, unordered_map<string, vector<string>>>& parserTable,
                                     const unordered_map<string, vector<vector<string>>>& G,
                                     const unordered_map<string, unordered_set<string>>& firstSets,
-                                    const unordered_map<string, unordered_set<string>>& followSets)
-                                    {
+                                    const unordered_map<string, unordered_set<string>>& followSets,
+                                    unordered_map<string, unordered_map<string, vector<string>>> &firstMap) {
     for (const auto& [nonTerminal, productions] : G) {
+        const unordered_set<string>& firstSet = firstSets.at(nonTerminal);
 
-        for (const auto& symbols : productions) {
+        // 递归遍历 FIRST 集合
+        for (const string& terminal : firstSet) {
+            if (terminal != "ε") {
+                parserTable[nonTerminal][terminal] = firstMap[nonTerminal][terminal];
+            }
+        }
 
-            for (const string& symbol : symbols) {
-                if (G.find(symbol) == G.end()) {
-                    parserTable[nonTerminal][symbol] = symbols;
-                    break;
-                } else {
-                    const unordered_set<string>& firstSet = firstSets.at(symbol);
+        // 如果 FIRST 集合中包含 ε，则将 FOLLOW 集合对应的产生式赋给预测分析表
+        if (firstSet.find("ε") != firstSet.end()) {
+            const unordered_set<string>& followSet = followSets.at(nonTerminal);
 
-                    for (const string& terminal : firstSet) {
-                        if (terminal != "ε") {
-                            parserTable[nonTerminal][terminal] = symbols;
-                        }
-                    }
-                    if (firstSet.find("ε") != firstSet.end()) {
-                        const unordered_set<string>& followSet = followSets.at(nonTerminal);
-                        for (const string& terminal : followSet) {
-                            if (terminal != "ε") {
-                                parserTable[nonTerminal][terminal] = symbols;
-                            }
-                        }
-                    }
-                    if (firstSet.find("ε") == firstSet.end()) {
-                        break;
-                    }
-                }
+            for (const string& terminal : followSet) {
+                parserTable[nonTerminal][terminal].emplace_back("ε");
             }
         }
     }
