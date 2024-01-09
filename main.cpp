@@ -1,13 +1,14 @@
 #include <bits/stdc++.h>
-#include "grammarParser.h"
+#include "GrammarProcess.h"
 #include "LL1GrammarChecker.h"
-#include "LL1ParserTable.h"
+#include "PredictiveParser.h"
 using namespace std;
 
 
 ifstream  fin;   // 读取文件的指针，用于获取文法
 unordered_map<string, vector<vector<string> > > G;   // 将读入文件的文法存入动态数组中方便操作，即表达式非终结符为key，右部每个产生式为一个vector，其中装非终结符和终结符
 unordered_map<string, unordered_set<string> > firstSets; // FIRST集合
+unordered_map<string, unordered_map<string, vector<string> > > firstMap; // 记录每个非终结符的FIRST集合中每个终结符所对应的产生式，方便后续处理预测分析表
 unordered_map<string, unordered_set<string> > followSets; // FOLLOW集合
 unordered_map<string, unordered_map<string, vector<string> > > parserTable; // 预测分析表
 string starter; // 文法开始符，默认第一个符号
@@ -58,7 +59,7 @@ void inputGrammar()
 
     // 打印读取的文法规则
     cout<<"所读入的文法为：G("<<starter<<")\n";
-    grammarParser::display(G);
+    GrammarProcess::display(G);
 }
 
 int main()
@@ -72,11 +73,11 @@ int main()
         // 词法分析
 
         // 语法分析
-//        grammarParser::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
-        grammarParser::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
-//        grammarParser::simplifyGrammar(G, starter);     // 简化后最终版本
-        grammarParser::calculateFirstSet(G, firstSets); // FIRST集合
-        grammarParser::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
+//        GrammarProcess::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
+        GrammarProcess::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
+//        GrammarProcess::simplifyGrammar(G, starter);     // 简化后最终版本
+        GrammarProcess::calculateFirstSet(G, firstSets, firstMap); // FIRST集合
+        GrammarProcess::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
 
         // 判断是否为LL(1)文法
         // 创建 LL1GrammarChecker 对象
@@ -86,8 +87,8 @@ int main()
         if(isLL1)
         {
             cout<<"该文法为LL（1）文法\n";
-            LL1ParserTable table;
-            table.getParserTable(parserTable, G, firstSets, followSets);
+            PredictiveParser table;
+            table.getParserTable(parserTable, G, firstSets, followSets, firstMap);
             table.printParserTable(parserTable);
 
         }

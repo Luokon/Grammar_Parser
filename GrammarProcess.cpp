@@ -2,10 +2,10 @@
 // Created by 左媛 on 2024/1/6.
 //
 
-#include "grammarParser.h"
+#include "GrammarProcess.h"
 
 // 显示当前文法
-void grammarParser::display(const unordered_map<string, vector<vector<string> > >& G)
+void GrammarProcess::display(const unordered_map<string, vector<vector<string> > >& G)
 {
     for (const auto& [nonterminal, productions] : G)
     {
@@ -26,9 +26,9 @@ void grammarParser::display(const unordered_map<string, vector<vector<string> > 
     }
 }
 // 间接左递归转换直接左递归
-vector<string > grammarParser::indirectRecursionDFS(const string& father, string first, vector<string> & result,
-                                                    const unordered_map<string, vector<vector<string>>>& G,
-                                                    set<string> visit)
+vector<string > GrammarProcess::indirectRecursionDFS(const string& father, string first, vector<string> & result,
+                                                     const unordered_map<string, vector<vector<string>>>& G,
+                                                     set<string> visit)
 {
     if (first == father) {
         result.insert(result.begin(), father);
@@ -52,7 +52,7 @@ vector<string > grammarParser::indirectRecursionDFS(const string& father, string
     return result;
 }
 
-void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vector<string>>>& G)
+void GrammarProcess::eliminateIndirectRecursion(unordered_map<string, vector<vector<string>>>& G)
 {
     unordered_map<string, vector<vector<string>>> newG(G);
     bool flag = false;
@@ -104,7 +104,7 @@ void grammarParser::eliminateIndirectRecursion(unordered_map<string, vector<vect
 }
 
 // 直接左递归消除处理
-void grammarParser::directLeftRecursion(unordered_map<string, vector<vector<string>>>& G)
+void GrammarProcess::directLeftRecursion(unordered_map<string, vector<vector<string>>>& G)
 {
     bool flag = false;
     unordered_map<string, vector<vector<string>>> newGrammar;
@@ -154,7 +154,7 @@ void grammarParser::directLeftRecursion(unordered_map<string, vector<vector<stri
 }
 
 // 使用深度优先搜索将能从开始符号到达的非终结符标记
-void grammarParser::markReachableProductions(unordered_map<string, vector<vector<string>>>& G, const string& start, unordered_set<string>& reachable)
+void GrammarProcess::markReachableProductions(unordered_map<string, vector<vector<string>>>& G, const string& start, unordered_set<string>& reachable)
 {
     reachable.insert(start);
 
@@ -176,7 +176,7 @@ void grammarParser::markReachableProductions(unordered_map<string, vector<vector
         }
     }
 }
-void grammarParser::simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start) {
+void GrammarProcess::simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start) {
     // 移除不能与开始符号关联的表达式，即没被标记的非终结符与其表达式
     unordered_set<string> reachable;
     markReachableProductions(G, start, reachable);
@@ -193,9 +193,9 @@ void grammarParser::simplifyGrammar(unordered_map<string, vector<vector<string> 
 }
 
 // 计算FIRST集合
-void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<string>>>& G, const string& symbol,
-                                         unordered_set<string>& firstSet, unordered_map<string, unordered_set<string>>& firstSets,
-                                         unordered_map<string, unordered_map<string, vector<string>>> &firstMap) {
+void GrammarProcess::calculateFirstSetDFS(unordered_map<string, vector<vector<string>>>& G, const string& symbol,
+                                          unordered_set<string>& firstSet, unordered_map<string, unordered_set<string>>& firstSets,
+                                          unordered_map<string, unordered_map<string, vector<string>>> &firstMap) {
     if (firstSet.find(symbol) != firstSet.end()) {
         return; // 已经计算过，避免重复计算
     }
@@ -231,8 +231,8 @@ void grammarParser::calculateFirstSetDFS(unordered_map<string, vector<vector<str
     }
 }
 
-void grammarParser::calculateFirstSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets,
-                                      unordered_map<string, unordered_map<string, vector<string>>> &firstMap)
+void GrammarProcess::calculateFirstSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets,
+                                       unordered_map<string, unordered_map<string, vector<string>>> &firstMap)
                                       {
     bool updated;
     do {
@@ -258,7 +258,7 @@ void grammarParser::calculateFirstSet(unordered_map<string, vector<vector<string
     }
 }
 // 计算FOLLOW集合
-void grammarParser::calculateFollowSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets, unordered_map<string, unordered_set<string>>& followSets, const string& start) {
+void GrammarProcess::calculateFollowSet(unordered_map<string, vector<vector<string>>>& G, unordered_map<string, unordered_set<string>>& firstSets, unordered_map<string, unordered_set<string>>& followSets, const string& start) {
     // 初始化起始符号的FOLLOW集合
     followSets[start].insert("$");
 

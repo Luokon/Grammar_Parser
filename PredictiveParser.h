@@ -13,7 +13,7 @@
 #include <set>
 using namespace std;
 
-class LL1ParserTable {
+class PredictiveParser {
 public:
     static void getParserTable(unordered_map<string, unordered_map<string, vector<string>>> &parserTable,
                         const unordered_map<string, vector<vector<string>>> &G,

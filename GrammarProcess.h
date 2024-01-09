@@ -2,12 +2,12 @@
 // Created by 左媛 on 2024/1/6.
 //
 
-#ifndef GRAMMAR_PARSER_GRAMMARPARSER_H
-#define GRAMMAR_PARSER_GRAMMARPARSER_H
+#ifndef GRAMMAR_PARSER_GRAMMARPROCESS_H
+#define GRAMMAR_PARSER_GRAMMARPROCESS_H
 #include <bits/stdc++.h>
 using namespace std;
 
-class grammarParser {
+class GrammarProcess {
 public:
     static void display(const unordered_map<string, vector<vector<string>>>& G);
     static void directLeftRecursion(unordered_map<string, vector<vector<string> > >& G); // 消除直接左递归
@@ -34,4 +34,4 @@ public:
 };
 
 
-#endif //GRAMMAR_PARSER_GRAMMARPARSER_H
+#endif //GRAMMAR_PARSER_GRAMMARPROCESS_H
