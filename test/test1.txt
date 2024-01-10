@@ -1,2 +1,3 @@
-S -> A a | b
-A -> S y
+E -> E + T | T
+T -> T * F | F
+F -> ( E ) | i

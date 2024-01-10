@@ -52,17 +52,6 @@ void PredictiveParser::getParserTable(unordered_map<string, unordered_map<string
 }
 
 void PredictiveParser::printParserTable(const unordered_map<string, unordered_map<string, vector<string>>>& parserTable) {
-//    cout << "LL1 Parser Table:" << endl;
-//
-//    for (const auto& [row, columns] : parserTable) {
-//        for (const auto& [col, production] : columns) {
-//            cout << row << ", " << col << " : ";
-//            for (const auto& symbol : production) {
-//                cout << symbol;
-//            }
-//            cout << "\n";
-//        }
-//    }
     cout << "LL1 Parser Table:" << endl;
     cout << setw(10) << "NonTerminal" << " | ";
     set<string> col;
