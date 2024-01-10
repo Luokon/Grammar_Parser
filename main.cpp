@@ -4,8 +4,6 @@
 #include "PredictiveParser.h"
 using namespace std;
 
-
-ifstream  fin;   // 读取文件的指针，用于获取文法
 unordered_map<string, vector<vector<string> > > G;   // 将读入文件的文法存入动态数组中方便操作，即表达式非终结符为key，右部每个产生式为一个vector，其中装非终结符和终结符
 unordered_map<string, unordered_set<string> > firstSets; // FIRST集合
 unordered_map<string, unordered_map<string, vector<string> > > firstMap; // 记录每个非终结符的FIRST集合中每个终结符所对应的产生式，方便后续处理预测分析表
@@ -13,9 +11,8 @@ unordered_map<string, unordered_set<string> > followSets; // FOLLOW集合
 unordered_map<string, unordered_map<string, vector<string> > > parserTable; // 预测分析表
 string starter; // 文法开始符，默认第一个符号
 
-void inputGrammar()
+void inputGrammar(ifstream & fin)
 {
-    G.clear();
     string line;
     while (getline(fin, line))
     {
@@ -61,6 +58,7 @@ void inputGrammar()
     cout<<"所读入的文法为：G("<<starter<<")\n";
     GrammarProcess::display(G);
 }
+
 void show()
 {
     // 终端显示界面
@@ -76,13 +74,24 @@ void show()
 }
 void showSentence()
 {
-    
+    cout << "输入对应数字选择一个选项：              \n";
+    cout <<  "       0. 测试默认的句子文件      \n";
+    cout <<  "       1. 自己输入文件路径    \n";
+    cout <<  "       2. 退出                     \n";
+    cout << "请输入数字并按下回车键：";
 }
 int main()
 {
     int cho = 0;
     while(cho != 4)
     {
+        G.clear();
+        starter.clear();
+        firstSets.clear();
+        firstMap.clear();
+        followSets.clear();
+        parserTable.clear();
+
         string path = "";
         show();
         cin >> cho;
@@ -108,15 +117,17 @@ int main()
                 return 0;
             default:
                 cout << "无效的选项！" << endl;
-                break;
+                return 0;
         }
+        ifstream  fin;   // 读取文件的指针，用于获取文法
         fin.open(path, ios::in);
-        if (!fin.is_open()) printf("ERROR: 文件不存在！\n");
+        if (!fin.is_open()) printf("ERROR: 文法文件不存在！\n");
         else
         {
-            inputGrammar();
+            inputGrammar(fin);
             // 语法分析
             GrammarProcess::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
+            GrammarProcess::simplifyGrammar(G, starter);    // 删除无关联产生式
             GrammarProcess::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
             GrammarProcess::calculateFirstSet(G, firstSets, firstMap); // FIRST集合
             GrammarProcess::calculateFollowSet(G, firstSets, followSets, starter);  // FOLLOW集合
@@ -126,14 +137,51 @@ int main()
             bool isLL1 = grammarChecker.isLL1Grammar(G);
             if(isLL1)
             {
-                cout<<"通过检验，该文法为LL（1）文法，可以继续分析，请选择接下来的动作：\n";
-
-
+                cout<<"通过检验，该文法为LL（1）文法，可以继续分析，将生成预测分析表：\n";
                 PredictiveParser table;
                 table.getParserTable(parserTable, G, firstSets, followSets, firstMap);
                 table.printParserTable(parserTable);
-                vector<string> sentence = {"*", "i", "+", "i"};
-                PredictiveParser::LL1Parser(parserTable, sentence, starter);
+
+                showSentence();
+                int cho2;
+                cin >> cho2;
+                switch (cho2) {
+                    case 0:
+                        path = "F:\\ClionProject\\Grammar_Parser\\test\\sentences0.txt";
+                        break;
+                    case 1:
+                        cout << "请输入你想分析的句子所存储的文件路径: ";
+                        cin >> path;
+                        cout << endl;
+                        break;
+                    case 2:
+                        return 0;
+
+                }
+                ifstream fsentences;
+                fsentences.open(path, ios::in);
+                if (!fsentences.is_open()) printf("ERROR: 句子文件不存在！\n");
+                else
+                {
+                    string symbol;
+                    vector<string> sentence;
+                    int row = 0;
+                    while (fsentences >> symbol)
+                    {
+                        if (symbol != ";")
+                        {
+                            sentence.push_back(symbol);
+                        }
+                        else
+                        {
+                            cout << "第" << row << "个句子:\n";
+                            row++;
+                            PredictiveParser::LL1Parser(parserTable, sentence, starter);
+                            sentence.clear();
+                        }
+                    }
+                }
+
             }
             else cout<<"该文法不是LL（1）文法\n";
         }

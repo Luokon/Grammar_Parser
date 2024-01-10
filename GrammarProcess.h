@@ -28,7 +28,10 @@ public:
                             unordered_map<string, unordered_set<string>> &followSets, const string &start);
 
 
+    static void simplifyGrammar(unordered_map<string, vector<vector<string>>> &G, string start);
 
+    static void markReachableProductions(unordered_map<string, vector<vector<string>>> &G, const string &start,
+                                  unordered_set<string> &reachable);
 };
 
 

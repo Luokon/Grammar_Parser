@@ -90,7 +90,48 @@ void GrammarProcess::eliminateIndirectRecursion(unordered_map<string, vector<vec
         cout << "该文法没有间接左递归\n";
     }
 }
+// 使用深度优先搜索将能从开始符号到达的非终结符标记
+void GrammarProcess::markReachableProductions(unordered_map<string, vector<vector<string>>>& G, const string& start, unordered_set<string>& reachable)
+{
+    reachable.insert(start);
 
+    if (G.find(start) != G.end()) {
+        for (const auto& production : G[start]) {
+            for (const auto& symbol : production) {
+                if (G.count(symbol)) {
+                    string nonTerminal = symbol;
+
+                    if (!production.empty() && production[1] == "'") {
+                        nonTerminal += "'";
+                    }
+
+                    if (reachable.count(nonTerminal) == 0) {
+                        markReachableProductions(G, nonTerminal, reachable);
+                    }
+                }
+            }
+        }
+    }
+}
+void GrammarProcess::simplifyGrammar(unordered_map<string, vector<vector<string> > >& G, string start) {
+    // 移除不能与开始符号关联的表达式，即没被标记的非终结符与其表达式
+    unordered_set<string> reachable;
+    markReachableProductions(G, start, reachable);
+    bool flag = false;
+    for (auto it = G.begin(); it != G.end();) {
+        if (reachable.count(it->first) == 0) {
+            it = G.erase(it);
+            flag = true;
+        } else {
+            ++it;
+        }
+    }
+    if(flag)
+    {
+        cout<<"\n删去与开始符号无关联符号后的文法：\n";
+        display(G);
+    }
+}
 // 直接左递归消除处理
 void GrammarProcess::directLeftRecursion(unordered_map<string, vector<vector<string>>>& G)
 {
