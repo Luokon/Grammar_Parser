@@ -84,7 +84,7 @@ void PredictiveParser::printParserTable(const unordered_map<string, unordered_ma
 // 自顶向下分析
 void PredictiveParser::LL1Parser(unordered_map<string, unordered_map<string, vector<string>>> parserTable, vector<string> sentence, string start)
 {
-    cout<<"分析的句子：";
+    cout<<"  分析的句子：";
     sentence.push_back("$");
     for(auto i: sentence)
     {
@@ -110,7 +110,7 @@ void PredictiveParser::LL1Parser(unordered_map<string, unordered_map<string, vec
                 index++;
             }else {
                 flag = false;
-                cout << "位置 "<< index << "错误：无法识别" << x << endl;
+                cout << "  位置 "<< index << "错误：错误符号"<< sentence[index] << "，无法识别"  << endl;
                 index++;
             }
         } else {
@@ -118,7 +118,7 @@ void PredictiveParser::LL1Parser(unordered_map<string, unordered_map<string, vec
           if(x == "$") {
               // 分析结束
               for(auto i: sentence) cout<< i << " ";
-              cout << "分析结束，语法正确\n";
+              cout << "  分析结束，语法正确\n";
               break;
           }
           else {
@@ -131,11 +131,12 @@ void PredictiveParser::LL1Parser(unordered_map<string, unordered_map<string, vec
               }
               else {
                   flag = false;
-                  cout << "位置 "<< index << "错误：" << x << "，"<< sentence[index] << "无法找到对应产生式\n";
+                  cout << "  位置 "<< index << "错误：" << sentence[index] << sentence[index + 1] << "语法错误\n";
               }
           }
         }
     }
     if(flag) cout << "分析完成，句子合法!\n";
     else cout << "分析完成，句子不合法！\n";
+    cout << '\n';
 }
