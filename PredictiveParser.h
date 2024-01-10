@@ -4,13 +4,7 @@
 
 #ifndef LL1_PARSER_TABLE_H
 #define LL1_PARSER_TABLE_H
-#include <iostream>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include <string>
-#include <iomanip>
-#include <set>
+#include <bits/stdc++.h>
 using namespace std;
 
 class PredictiveParser {
@@ -22,6 +16,8 @@ public:
                         unordered_map<string, unordered_map<string, vector<string>>> &firstMap);
 
     static void printParserTable(const unordered_map<string, unordered_map<string, vector<string>>> &parserTable);
+
+    static void LL1Parser(unordered_map<string, unordered_map<string, vector<string>>> parserTable, vector<string> sentence, string start);
 };
 
 #endif // LL1_PARSER_TABLE_H

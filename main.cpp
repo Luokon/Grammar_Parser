@@ -64,16 +64,14 @@ void inputGrammar()
 
 int main()
 {
-    fin.open("F:\\ClionProject\\Grammar_Parser\\test\\test2.txt", ios::in);
+    fin.open("F:\\ClionProject\\Grammar_Parser\\test\\test3.txt", ios::in);
     if (!fin.is_open()) printf("ERROR: can not open the file\n");
     else
     {
         inputGrammar();
 
-        // 词法分析
-
         // 语法分析
-//        GrammarProcess::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
+        GrammarProcess::eliminateIndirectRecursion(G);   // 进行查找间接左递归，将间接左递归转换为直接左递归，若没有则不作处理
         GrammarProcess::directLeftRecursion(G);    // 消除直接左递归，同理边判断边处理，没有则不做处理
 //        GrammarProcess::simplifyGrammar(G, starter);     // 简化后最终版本
         GrammarProcess::calculateFirstSet(G, firstSets, firstMap); // FIRST集合
@@ -91,6 +89,8 @@ int main()
             table.getParserTable(parserTable, G, firstSets, followSets, firstMap);
             table.printParserTable(parserTable);
 
+            vector<string> sentence = {"*", "i", "+", "i"};
+            PredictiveParser::LL1Parser(parserTable, sentence, starter);
         }
         else cout<<"该文法不是LL（1）文法\n";
     }

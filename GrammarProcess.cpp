@@ -37,6 +37,7 @@ vector<string > GrammarProcess::indirectRecursionDFS(const string& father, strin
 
     if(!visit.count(first))
     {
+        visit.insert(first);
         if (G.count(first)) {   // 非终结符
             vector<vector<string>> productions = G.at(first);
 
@@ -46,7 +47,6 @@ vector<string > GrammarProcess::indirectRecursionDFS(const string& father, strin
                     result = indirectRecursionDFS(father, production[0], result, G, visit);
                 }
             }
-            visit.insert(first);
         }
     }
     return result;
@@ -91,7 +91,6 @@ void GrammarProcess::eliminateIndirectRecursion(unordered_map<string, vector<vec
                 newProductions.push_back(production);
             }
         }
-//        cout<<"无";
         newG[father] = newProductions;
     }
     if(flag)
